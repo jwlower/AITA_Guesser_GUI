@@ -15,6 +15,7 @@ def predict(model):
     txt=textBox.get("1.0","end-1c")
     if txt == "":
         p.configure(text = "No Input.",fg="red",font=("Comic Sans MS",24))
+        act.configure(text = " ")
     else:
         p.configure(text = "Predicting...",fg="black",font=("Arial",12))
 
@@ -28,20 +29,24 @@ def predict(model):
         s = pd.Series([txt],name="body")
         s_test_cv = cv.transform(s)
         pred = NB.predict_proba(s_test_cv)
+        abs = NB.predict(s_test_cv)
         if model == 1:
             pred = MLP.predict_proba(s_test_cv)
+            abs = MLP.predict(s_test_cv)
         if model == 2:
             pred = KNN.predict_proba(s_test_cv)
+            abs = KNN.predict(s_test_cv)
         if model == 3:
             pred = RF.predict_proba(s_test_cv)
+            abs = RF.predict(s_test_cv)
 
-
+        vals = ["Not the A-hole", "You're the A-hole","Everyone Sucks","No A-holes here"]
         p.configure(    text = 'NTA chance = %'+str(int(pred[0][0]*100))+
                         ' YTA chance = %'+str(int(pred[0][1]*100))+
                         ' EOS chance = %'+str(int(pred[0][2]*100))+
                         ' NAH chance = %'+str(int(pred[0][3]*100))
                         ,fg="black",font=("Arial",12))
-
+        act.configure( text = vals[int(abs)],fg="black",font=("Arial",12))
 
 
 
@@ -55,23 +60,30 @@ model = 0 #0 for NB
 
 #Commit button
 #command=lambda: retrieve_input() >>> just means do this when i press the button
-buttonCommit0=Button(root, height=1, width=50, text="Naive Bayes (Pretty Accurate)",
-                    command=lambda: predict(0))
-buttonCommit0.pack(side=BOTTOM)
 
-buttonCommit0=Button(root, height=1, width=50, text="MLP (More Accurate)",
-                    command=lambda: predict(1))
-buttonCommit0.pack(side=BOTTOM)
 
-buttonCommit0=Button(root, height=1, width=50, text="KNN (WILD WEST)",
+
+
+buttonCommit0=Button(root, height=1, width=50, text="K Nearest Neighbors",
                     command=lambda: predict(2))
 buttonCommit0.pack(side=BOTTOM)
 
-buttonCommit0=Button(root, height=1, width=50, text="Random Forest (Almost always wrong)",
+buttonCommit1=Button(root, height=1, width=50, text="Random Forest",
                     command=lambda: predict(3))
-buttonCommit0.pack(side=BOTTOM)
+buttonCommit1.pack(side=BOTTOM)
+
+buttonCommit2=Button(root, height=1, width=50, text="Naive Bayes",
+                    command=lambda: predict(0))
+buttonCommit2.pack(side=BOTTOM)
+
+buttonCommit3=Button(root, height=1, width=50, text="Multi-Layer Perceptron",
+                    command=lambda: predict(1))
+buttonCommit3.pack(side=BOTTOM)
 
 p = Label(root,text="What will this be?")
 p.pack()
+
+act = Label(root,text="Pick a method to guess the outcome!")
+act.pack()
 
 mainloop()
